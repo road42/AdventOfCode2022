@@ -1,6 +1,9 @@
-public class Elf
+namespace Xmas
 {
-    public int Number { get; set; }
+    public class Elf
+    {
+        public int Number { get; set; }
 
-    public int Calories { get; set; }
+        public int Calories { get; set; }
+    }
 }

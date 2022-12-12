@@ -1,4 +1,6 @@
-﻿
+﻿using System.Globalization;
+using Xmas;
+
 var readings = new List<Elf>();
 var i = 1;
 var value = 0;
@@ -8,7 +10,7 @@ foreach (string line in System.IO.File.ReadLines(@"input.txt"))
 {
     if (!string.IsNullOrEmpty(line))
     {
-        value += int.Parse(line);
+        value += int.Parse(line, CultureInfo.InvariantCulture);
     }
     else
     {
@@ -19,11 +21,15 @@ foreach (string line in System.IO.File.ReadLines(@"input.txt"))
 }
 
 // Output
-var top10 = readings
+var top3 = readings
             .OrderByDescending(c => c.Calories)
-            .Take(10);
+            .Take(3);
 
-foreach (var e in top10)
+var sumTop3 = top3.Sum(c => c.Calories);
+
+foreach (var e in top3)
 {
     Console.WriteLine($"{e.Number}, {e.Calories}");
 }
+
+Console.WriteLine(sumTop3);
