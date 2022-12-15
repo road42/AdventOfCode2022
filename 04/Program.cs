@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 
 var fullyCounter = 0;
+var partCounter = 0;
 
 // Read file
 foreach (string line in System.IO.File.ReadLines(@"input.txt"))
@@ -16,39 +17,49 @@ foreach (string line in System.IO.File.ReadLines(@"input.txt"))
     var secondElfFrom = int.Parse(secondElfPairNumbers[0], NumberStyles.Integer, CultureInfo.CurrentCulture);
     var secondElfTo = int.Parse(secondElfPairNumbers[1], NumberStyles.Integer, CultureInfo.CurrentCulture);
 
-    var numberList = new List<int>();
-    numberList.Add(firstElfFrom);
-    numberList.Add(firstElfTo);
-    numberList.Add(secondElfFrom);
-    numberList.Add(secondElfTo);
+    int max = Math.Max(firstElfFrom, Math.Max(firstElfTo, Math.Max(secondElfFrom, secondElfTo)));
 
     // Create list with numbers from 1 to max
-    int[] rangeList = Enumerable.Range(0, numberList.Max() + 1).ToArray();
+    int[] rangeList = Enumerable.Range(0, max + 1).ToArray();
 
     var firstElfRange = rangeList[firstElfFrom..(firstElfTo+1)];
     var secondElfRange = rangeList[secondElfFrom..(secondElfTo+1)];
 
+    // Fully overlap checking
     // check if 1 is in 2
     var isFirstFullyInSecond = true;
+    var isFirstPartInSecond = false;
     foreach (var c in firstElfRange)
     {
+        // Fully check
         if (!secondElfRange.Contains(c))
             isFirstFullyInSecond = false;
+
+        // part check
+        if (secondElfRange.Contains(c))
+            isFirstPartInSecond = true;
     }
 
     // check if 2 is in 1
     var isSecondFullyInFirst = true;
+    var isSecondPartInFirst = false;
     foreach (var c in secondElfRange)
     {
+        // Fully check
         if (!firstElfRange.Contains(c))
             isSecondFullyInFirst = false;
+
+        // Part check
+        if (firstElfRange.Contains(c))
+            isSecondPartInFirst = true;
     }
 
     if (isFirstFullyInSecond || isSecondFullyInFirst )
         fullyCounter++;
 
-    Console.WriteLine($"{cleanLine}: {firstElfRange.First()}-{firstElfRange.Last()},{secondElfRange.First()}-{secondElfRange.Last()} ... ?:{isFirstFullyInSecond}|{isSecondFullyInFirst}");
-
+    if (isFirstPartInSecond || isSecondPartInFirst )
+        partCounter++;
 }
 
-Console.WriteLine(fullyCounter);
+Console.WriteLine($"Fully: {fullyCounter}");
+Console.WriteLine($"Part:  {partCounter}");
