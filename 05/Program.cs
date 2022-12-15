@@ -27,6 +27,7 @@ foreach (string line in System.IO.File.ReadLines(@"input.txt"))
 }
 
 var stacks = new Dictionary<int, LinkedList<string>>();
+var stacksPart2 = new Dictionary<int, LinkedList<string>>();
 
 // Initialize stack array
 
@@ -52,6 +53,7 @@ var amountOfStacks = int.Parse(number, NumberStyles.Integer, CultureInfo.Current
 for (var i = 0; i < amountOfStacks; i++)
 {
     stacks.Add(i, new LinkedList<string>());
+    stacksPart2.Add(i, new LinkedList<string>());
 }
 
 // fill crates to stackarray
@@ -71,12 +73,16 @@ for (var i = stackLines.Count - 2; i >= 0; i--)
             .Trim();
 
         if (!string.IsNullOrEmpty(stackEntry))
+        {
             stacks[j].AddLast(stackEntry);
+            stacksPart2[j].AddLast(stackEntry);
+        }
     }
 }
 
 void stacksOutput()
 {
+    Console.WriteLine("--1---------------");
     foreach (var s in stacks)
     {
         Console.Write($"S:{s.Key+1} - ");
@@ -89,14 +95,34 @@ void stacksOutput()
         Console.WriteLine();
     }
 
-    Console.WriteLine();
+    Console.WriteLine("--2---------------");
+    foreach (var s in stacksPart2)
+    {
+        Console.Write($"S:{s.Key+1} - ");
+
+        foreach (var e in s.Value)
+        {
+            Console.Write($"{e}");
+        }
+
+        Console.WriteLine();
+    }
+
+    Console.WriteLine("--M---------------");
+    Console.Write("Message1: ");
     foreach (var s in stacks)
     {
         if (s.Value.Count > 0)
-            Console.Write($"Message: {s.Value.Last()}");
+            Console.Write($"{s.Value.Last()}");
+    }
+    Console.WriteLine();
+    Console.Write("Message2: ");
+    foreach (var s in stacksPart2)
+    {
+        if (s.Value.Count > 0)
+            Console.Write($"{s.Value.Last()}");
     }
 
-    Console.WriteLine();
 }
 
 // Do moves
@@ -110,12 +136,29 @@ foreach (var m in instructionLines)
     var fromStackNumber = int.Parse(instructions[3], NumberStyles.Integer, CultureInfo.CurrentCulture);
     var toStackNumber = int.Parse(instructions[5], NumberStyles.Integer, CultureInfo.CurrentCulture);
 
+    // Part 1
     for (var i = 0; i < moveAmount; i++)
     {
         var element = stacks[fromStackNumber - 1].Last();
         stacks[fromStackNumber - 1].RemoveLast();
         stacks[toStackNumber - 1].AddLast(element);
     }
+
+    // Part 2
+    var elementPart2 = new List<string>();
+
+    for (var i = 0; i < moveAmount; i++)
+    {
+        elementPart2.Add(stacksPart2[fromStackNumber - 1].Last());
+        stacksPart2[fromStackNumber - 1].RemoveLast();
+    }
+
+    elementPart2.Reverse();
+    foreach (var e in elementPart2)
+    {
+        stacksPart2[toStackNumber - 1].AddLast(e);
+    }
+
 }
 
 stacksOutput();
