@@ -4,7 +4,10 @@ using System.IO;
 // Read File
 var line = File.ReadLines(@"input.txt").First();
 
-var search = new Queue<char>(5);
+// Part 2
+var amountOfCharsNeeded = 14;
+
+var search = new Queue<char>(amountOfCharsNeeded+1);
 var charCounter = 0;
 
 foreach (var c in line)
@@ -12,18 +15,18 @@ foreach (var c in line)
     search.Enqueue(c);
     charCounter++;
 
-    if (search.Count == 5)
+    if (search.Count == amountOfCharsNeeded+1)
         search.Dequeue();
 
     var content = queueContentAsString(search);
 
-    if (search.Count == 4)
+    if (search.Count == amountOfCharsNeeded)
     {
         var letters = content?
             .Distinct()
             .Count();
 
-        if (letters == 4)
+        if (letters == amountOfCharsNeeded)
         {
             Console.WriteLine($"Found@ {charCounter} - Q: {content}");
             break;
