@@ -1,44 +1,72 @@
 ﻿
 using System.Globalization;
+using System.Text.RegularExpressions;
 
-var root = new Xmas.ElfFolder("/");
-var currentDir = root;
+
+// I struggled in part 2
+// restart with port from https://pastebin.com/3TJs9GyR
+
+var directories = new Stack<string>();
+var size = new Dictionary<string, int>();
 
 // Process file
 foreach (string line in System.IO.File.ReadLines(@"input.txt"))
 {
-    // Command: Line starts with $ == command
-
+    // CD command
     if (line.StartsWith("$ cd", StringComparison.CurrentCulture))
     {
-        // Change directory
-        if (line == "$ cd /")
-            currentDir = root;
-        else if (line == "$ cd ..")
+        var cdValue = line.Replace("$ cd ", "");
+
+        if (cdValue == "/")
         {
-            if (currentDir.Parent != null)
-                currentDir = currentDir.Parent;
-            else
-                throw new InvalidDataException("Already root");
+            directories.Push(cdValue);
+        }
+        else if (cdValue == "..")
+        {
+            directories.Pop();
         }
         else
-            currentDir = currentDir.GetSubFolder(line.Replace("$ cd ", ""));
-
+        {
+            directories.Push(directories.First() + cdValue + "/" );
+        }
     }
-
-    // Non command lines
-
-    // may be: dir <name>
-    if (line.StartsWith("dir", StringComparison.CurrentCulture))
-        currentDir.CreateDir(line.Replace("dir ", "", StringComparison.CurrentCulture));
-
-    // file may be: <size> <name>
-    if (char.IsDigit(line[0]))
+    // Filelisting
+    else if (char.IsDigit(line[0]))
     {
-        var parts = line.Split(" ");
-        currentDir.CreateFile(parts[1], int.Parse(parts[0], NumberStyles.Integer, CultureInfo.CurrentCulture));
+        var fileSize = int.Parse(line.Split(" ")[0], NumberStyles.Integer, CultureInfo.CurrentCulture);
+
+        foreach (var d in directories)
+        {
+            if (!size.ContainsKey(d))
+            {
+                size.Add(d, 0);
+            }
+
+            size[d] += fileSize;
+        }
     }
 }
 
-//Console.WriteLine(root.ToString());
-Console.WriteLine($"SUM: {root.SumPrintPart1(0)}");
+// Sums
+var totalSize = 70000000;
+var occupiedSize = size.First().Value;
+var threshold = 30000000 - (totalSize - occupiedSize);
+var sizeUnder10000 = 0;
+var foundSize = totalSize;
+
+foreach (var s in size)
+{
+    // Part 1
+    if (s.Value <= 100000)
+        sizeUnder10000 += s.Value;
+
+    // Part 2
+    if (s.Value >= threshold && s.Value < foundSize)
+    {
+        foundSize = s.Value;
+    }
+}
+
+Console.WriteLine($"Total:            {occupiedSize}");
+Console.WriteLine($"Size under 10000: {sizeUnder10000}");
+Console.WriteLine($"Foundsize:        {foundSize}");
